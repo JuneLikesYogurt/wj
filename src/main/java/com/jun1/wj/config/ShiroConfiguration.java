@@ -1,6 +1,7 @@
 package com.jun1.wj.config;
 
 //import com.jun1.wj.filter.URLPathMatchingFilter;
+import com.jun1.wj.filter.URLPathMatchingFilter;
 import com.jun1.wj.realm.WJRealm;
 import org.apache.shiro.authc.credential.HashedCredentialsMatcher;
 import org.apache.shiro.spring.LifecycleBeanPostProcessor;
@@ -12,6 +13,11 @@ import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
 import org.apache.shiro.web.servlet.SimpleCookie;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
+import javax.servlet.Filter;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 
 @Configuration
@@ -25,12 +31,12 @@ public class ShiroConfiguration {
     public ShiroFilterFactoryBean shiroFilter (SecurityManager securityManager) {
         ShiroFilterFactoryBean shiroFilterFactoryBean = new ShiroFilterFactoryBean();
         shiroFilterFactoryBean.setSecurityManager(securityManager);
-        /*shiroFilterFactoryBean.setLoginUrl("/nowhere");
+        shiroFilterFactoryBean.setLoginUrl("/nowhere");
 
         Map<String, String> filterChainDefinitionMap = new LinkedHashMap<String, String>();
         Map<String, Filter> customizedFilter = new HashMap<>(); // 自定义过滤器设置 1
 
-//        customizedFilter.put("url", getURLPathMatchingFilter());    // 自定义过滤器设置 2，命名，需在设置过滤路径前
+        customizedFilter.put("url", getURLPathMatchingFilter());    // 自定义过滤器设置 2，命名，需在设置过滤路径前
 
         filterChainDefinitionMap.put("/api/authentication", "authc"); // 防鸡贼登录
         filterChainDefinitionMap.put("/api/menu", "authc");
@@ -39,13 +45,13 @@ public class ShiroConfiguration {
         filterChainDefinitionMap.put("/api/admin/**", "url"); // 自定义过滤器设置 3，设置过滤路径
 
         shiroFilterFactoryBean.setFilters(customizedFilter); // 自定应过滤器 4 ，启动
-        shiroFilterFactoryBean.setFilterChainDefinitionMap(filterChainDefinitionMap);*/
+        shiroFilterFactoryBean.setFilterChainDefinitionMap(filterChainDefinitionMap);
         return shiroFilterFactoryBean;
     }
 
-//    public URLPathMatchingFilter getURLPathMatchingFilter() {
-//        return new URLPathMatchingFilter();
-//    }
+    public URLPathMatchingFilter getURLPathMatchingFilter() {
+        return new URLPathMatchingFilter();
+    }
 
     @Bean
     public SecurityManager securityManager() {
@@ -55,19 +61,21 @@ public class ShiroConfiguration {
         return securityManager;
     }
 
-    /*public CookieRememberMeManager rememberMeManager() {
+    /*  启用 shiro 的 rememberMe，
+    *   单独保存一种新的状态，把 “记住我” 的状态与实际登录状态做出区分。
+    *   控制用户在访问不太敏感的页面时无需重新登录*/
+    public CookieRememberMeManager rememberMeManager() {
         CookieRememberMeManager cookieRememberMeManager = new CookieRememberMeManager();
         cookieRememberMeManager.setCookie(rememberMeCookie());
         cookieRememberMeManager.setCipherKey("EVANNIGHTLY_WAOU".getBytes());
         return cookieRememberMeManager;
-    }*/
-
-    /*@Bean
+    }
+    @Bean
     public SimpleCookie rememberMeCookie() {
         SimpleCookie simpleCookie = new SimpleCookie("rememberMe");
-        simpleCookie.setMaxAge(259200);
+        simpleCookie.setMaxAge(259200); // 配置存活时间，单位为 秒 ，259200即30天
         return simpleCookie;
-    }*/
+    }
 
     @Bean
     public WJRealm getWJRealm() {
